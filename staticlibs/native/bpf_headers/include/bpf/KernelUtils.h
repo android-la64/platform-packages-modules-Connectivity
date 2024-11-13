@@ -167,7 +167,16 @@ static constexpr bool isRiscV() {
 #endif
 }
 
-static_assert(isArm() || isX86() || isRiscV(), "Unknown architecture");
+static constexpr bool isLoongarch() {
+#if defined(__loongarch__)
+    static_assert(isUserspace64bit(), "loongarch must be 64 bit");
+    return true;
+#else
+    return false;
+#endif
+}
+
+static_assert(isArm() || isX86() || isRiscV() || isLoongarch(), "Unknown architecture");
 
 static __unused const char * describeArch() {
     // ordered so as to make it easier to compile time optimize,
@@ -176,6 +185,7 @@ static __unused const char * describeArch() {
         if (isArm()) return "64-on-aarch64";
         if (isX86()) return "64-on-x86-64";
         if (isRiscV()) return "64-on-riscv64";
+        if (isLoongarch()) return "64-on-loongarch64";
     } else if (isKernel64Bit()) {
         if (isArm()) return "32-on-aarch64";
         if (isX86()) return "32-on-x86-64";
